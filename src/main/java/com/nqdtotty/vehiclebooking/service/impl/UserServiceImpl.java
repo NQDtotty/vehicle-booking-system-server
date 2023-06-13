@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
             String passwordEncrypt = CommonClass.getMD5(userLoginRequest.getPassword().trim());
             if(user == null) {
                 commonResponse.setStatus(417);
-                commonResponse.setMessage("Account does not exist");
+                commonResponse.setMessage("User does not exist");
             } else {
                 if (passwordEncrypt.equals(user.getPassword().trim()) && user.getStatus().equals("active")){
                     commonResponse.setStatus(200);
@@ -39,10 +39,11 @@ public class UserServiceImpl implements UserService {
                     UserResponse loginResponse = new UserResponse();
                     loginResponse.setUserId(user.getUserId());
                     loginResponse.setPhoneNumber(user.getPhoneNumber());
-                    loginResponse.setFullname(user.getFullname());
+                    loginResponse.setFullname(user.getFullName());
                     loginResponse.setEmail(user.getEmail());
                     loginResponse.setGender(user.getGender());
                     loginResponse.setRole(user.getRole());
+                    loginResponse.setStatus(user.getStatus());
                     commonResponse.setData(loginResponse);
                 } else if (passwordEncrypt.equals(user.getPassword().trim()) && user.getStatus().equals("locked")) {
                     commonResponse.setStatus(417);
@@ -78,7 +79,7 @@ public class UserServiceImpl implements UserService {
                 user.setPhoneNumber(userRegisterRequest.getPhoneNumber());
                 user.setPassword(CommonClass.getMD5(userRegisterRequest.getPassword().trim()));
                 user.setEmail(userRegisterRequest.getEmail());
-                user.setFullname(userRegisterRequest.getFullname());
+                user.setFullName(userRegisterRequest.getFullName());
                 user.setGender(userRegisterRequest.getGender());
                 user.setRole("user");
                 user.setStatus("inactive");
@@ -88,7 +89,7 @@ public class UserServiceImpl implements UserService {
                 commonResponse.setMessage("Register successfully");
             } else {
                 commonResponse.setStatus(417);
-                commonResponse.setMessage("Account is existed");
+                commonResponse.setMessage("User exist");
             }
         } catch (Exception e) {
             commonResponse.setStatus(417);
@@ -101,7 +102,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserResponse> getAllUser() {
+    public CommonResponse getAllUser() {
+        CommonResponse commonResponse = new CommonResponse();
         List<User> userList = userRepository.findAll();
         if (userList != null){
             List<UserResponse> responseList = new ArrayList<>();
@@ -109,29 +111,35 @@ public class UserServiceImpl implements UserService {
                 UserResponse userResponse = new UserResponse();
                 userResponse.setUserId(userList.get(i).getUserId());
                 userResponse.setPhoneNumber(userList.get(i).getPhoneNumber());
-                userResponse.setFullname(userList.get(i).getFullname());
+                userResponse.setFullname(userList.get(i).getFullName());
                 userResponse.setEmail(userList.get(i).getEmail());
                 userResponse.setRole(userList.get(i).getRole());
                 userResponse.setGender(userList.get(i).getGender());
                 userResponse.setStatus(userList.get(i).getStatus());
                 responseList.add(userResponse);
             }
-            return responseList;
+            commonResponse.setStatus(200);
+            commonResponse.setMessage("Successfully");
+            commonResponse.setData(responseList);
+            return commonResponse;
         }else {
-            return null;
+            commonResponse.setStatus(417);
+            commonResponse.setMessage("Empty user");
+            return commonResponse;
         }
     }
 
     @Override
-    public CommonResponse updateUser(UserUpdateRequest userUpdateRequest) {
+    public CommonResponse updateUser(UserUpdateRequest userUpdateRequest, String userId) {
         CommonResponse commonResponse = new CommonResponse();
         try {
-            User user = userRepository.findByPhoneNumber(userUpdateRequest.getPhoneNumber().trim());
+            User user = userRepository.findByUserId(userId);
             if(user == null) {
                 commonResponse.setStatus(417);
-                commonResponse.setMessage("Account is not exist");
+                commonResponse.setMessage("User does not exist");
             } else {
-                user.setFullname(userUpdateRequest.getFullname());
+                user.setPhoneNumber(userUpdateRequest.getPhoneNumber());
+                user.setFullName(userUpdateRequest.getFullName());
                 user.setEmail(userUpdateRequest.getEmail());
                 user.setGender(userUpdateRequest.getGender());
                 user.setStatus(userUpdateRequest.getStatus());
@@ -160,7 +168,7 @@ public class UserServiceImpl implements UserService {
                 commonResponse.setMessage("Delete successfully");
             }else {
                 commonResponse.setStatus(417);
-                commonResponse.setMessage("Không tồn tại user để xóa !!!");
+                commonResponse.setMessage("User does not exist");
             }
         } catch (Exception e) {
             commonResponse.setStatus(417);
@@ -172,17 +180,40 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserResponse> searchByPhoneNumber(String keySearch) {
-        return null;
-    }
-
-    @Override
     public CommonResponse createAdmin(UserRegisterRequest request) {
         return null;
     }
 
     @Override
-    public CommonResponse changePassword(UserChangePasswordRequest request) {
-        return null;
+    public CommonResponse changePassword(UserChangePasswordRequest userChangePasswordRequest) {
+        CommonResponse commonResponse = new CommonResponse();
+        try {
+            User user = userRepository.findByPhoneNumber(userChangePasswordRequest.getPhoneNumber().trim());
+            if(user == null) {
+                commonResponse.setStatus(417);
+                commonResponse.setMessage("User does not exist");
+            } else {
+                if(!CommonClass.getMD5(userChangePasswordRequest.getOldPassword().trim()).equals(user.getPassword().trim())) {
+                    commonResponse.setStatus(417);
+                    commonResponse.setMessage("Wrong old password");
+                } else {
+                    if(!userChangePasswordRequest.getNewPassword().equals(userChangePasswordRequest.getConfirmNewPassword())) {
+                        commonResponse.setStatus(417);
+                        commonResponse.setMessage("Wrong confirm password");
+                    } else {
+                        user.setPassword(CommonClass.getMD5(userChangePasswordRequest.getNewPassword().trim()));
+                        userRepository.save(user);
+                        commonResponse.setStatus(200);
+                        commonResponse.setMessage("Change password successfully");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            commonResponse.setStatus(417);
+            commonResponse.setMessage("Fail to change password");
+            e.printStackTrace();
+        } finally {
+            return commonResponse;
+        }
     }
 }

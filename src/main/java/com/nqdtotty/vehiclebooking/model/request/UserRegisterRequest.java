@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class UserRegisterRequest implements Serializable {
     private final String phoneNumber;
     private final String password;
-    private final String fullname;
+    private final String fullName;
     private final String gender;
     private final String email;
 }

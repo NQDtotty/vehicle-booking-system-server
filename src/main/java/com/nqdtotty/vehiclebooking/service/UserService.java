@@ -5,7 +5,6 @@ import com.nqdtotty.vehiclebooking.model.request.UserLoginRequest;
 import com.nqdtotty.vehiclebooking.model.request.UserRegisterRequest;
 import com.nqdtotty.vehiclebooking.model.request.UserUpdateRequest;
 import com.nqdtotty.vehiclebooking.model.response.CommonResponse;
-import com.nqdtotty.vehiclebooking.model.response.UserResponse;
 
 import java.util.List;
 
@@ -14,15 +13,13 @@ public interface UserService {
 
     public CommonResponse registerUser(UserRegisterRequest userRegisterRequest);
 
-    public List<UserResponse> getAllUser();
+    public CommonResponse getAllUser();
 
-    public CommonResponse updateUser(UserUpdateRequest userUpdateRequest);
+    public CommonResponse updateUser(UserUpdateRequest userUpdateRequest, String userId);
 
-    CommonResponse deleteUser(String phoneNumber);
+    public CommonResponse deleteUser(String phoneNumber);
 
-    List<UserResponse> searchByPhoneNumber(String keySearch);
+    public CommonResponse createAdmin(UserRegisterRequest request);
 
-    CommonResponse createAdmin(UserRegisterRequest request);
-
-    CommonResponse changePassword(UserChangePasswordRequest request);
+    public CommonResponse changePassword(UserChangePasswordRequest request);
 }

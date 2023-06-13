@@ -9,4 +9,5 @@ public class UserChangePasswordRequest implements Serializable {
     private final String phoneNumber;
     private final String oldPassword;
     private final String newPassword;
+    private final String confirmNewPassword;
 }
