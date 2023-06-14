@@ -4,17 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserResponse implements Serializable {
+public class FeedbackResponse {
+    private String feedbackId;
     private String userId;
-    private String fullname;
-    private String gender;
-    private String phoneNumber;
-    private String email;
-    private String role;
+    private String message;
+    private String response;
     private String status;
 }

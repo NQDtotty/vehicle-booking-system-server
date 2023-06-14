@@ -6,8 +6,6 @@ import com.nqdtotty.vehiclebooking.model.request.UserRegisterRequest;
 import com.nqdtotty.vehiclebooking.model.request.UserUpdateRequest;
 import com.nqdtotty.vehiclebooking.model.response.CommonResponse;
 
-import java.util.List;
-
 public interface UserService {
     public CommonResponse loginUser(UserLoginRequest userLoginRequest);
 
